@@ -134,12 +134,11 @@ function StageRow({
 
         <button
           onClick={() => {
-            if (confirm('למחוק שלב זה?')) onDelete(stage.id)
+            if (confirm('למחוק את השלב הזה לצמיתות?')) onDelete(stage.id)
           }}
-          className="shrink-0 text-stone transition hover:text-gold-deep"
-          aria-label="מחק שלב"
+          className="shrink-0 rounded px-3 py-2 text-xs text-stone/60 transition hover:bg-red-50 hover:text-red-600"
         >
-          ✕
+          מחק
         </button>
       </div>
     </li>
