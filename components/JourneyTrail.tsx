@@ -52,8 +52,8 @@ export default function JourneyTrail({
 
       {/* Mobile — vertical with right rail */}
       <div className="md:hidden">
-        <ol className="relative space-y-4 pr-10">
-          <div className="absolute right-[18px] top-2 bottom-2 w-px bg-gold/40" />
+        <ol className="relative space-y-4 pr-6">
+          <div className="absolute right-[10px] top-2 bottom-2 w-px bg-gold/40" />
           {steps.map((s, i) => {
             const current = i === currentIdx;
             return (
@@ -64,11 +64,11 @@ export default function JourneyTrail({
                 transition={{ delay: i * 0.06, duration: 0.35, ease: "easeOut" }}
                 className="relative flex items-center gap-3"
               >
-                <span className="absolute -right-[8px]">
+                <span className="absolute -right-[18px]">
                   <Dot current={current} />
                 </span>
                 <span
-                  className={`text-sm ${
+                  className={`text-sm pr-8 ${
                     current ? "text-gold-deep" : "text-ink/70"
                   }`}
                 >
