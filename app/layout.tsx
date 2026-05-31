@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Heebo, Frank_Ruhl_Libre, Playfair_Display } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
@@ -29,7 +29,13 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Shey · מעקב ייצור תכשיטים",
   description: "מעקב אחר תהליך ייצור התכשיט שלך",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  userScalable: true,
 };
 
 export default function RootLayout({
