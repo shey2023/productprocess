@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { supabaseAdmin, JEWELRY_BUCKET } from "@/lib/supabase-server";
-import { getStages, stageLabelFrom, isFinalStage } from "@/lib/stages";
+import { getStages, stageLabelFrom, stageDescriptionFrom, isFinalStage } from "@/lib/stages";
 import JourneyTrail from "@/components/JourneyTrail";
 import UpdateCard from "@/components/UpdateCard";
 import CompletionHero from "@/components/CompletionHero";
@@ -92,6 +92,11 @@ export default async function TrackPage({
               {stageLabelFrom(stages, order.current_stage)}
             </span>
           </p>
+          {stageDescriptionFrom(stages, order.current_stage) && (
+            <p className="mx-auto mt-2 max-w-sm text-xs text-stone/70 italic">
+              {stageDescriptionFrom(stages, order.current_stage)}
+            </p>
+          )}
 
           {/* Journey so far — shown only when 2+ stages have happened.
               With a single stage, the headline above already tells the story. */}
@@ -144,6 +149,7 @@ export default async function TrackPage({
                   key={u.id}
                   index={i}
                   stageLabel={stageLabelFrom(stages, u.stage)}
+                  stageDescription={stageDescriptionFrom(stages, u.stage)}
                   createdAt={u.created_at}
                   noteText={u.note_text}
                   images={images}

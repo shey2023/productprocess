@@ -22,6 +22,10 @@ export function stageLabelFrom(stages: Stage[], key: string): string {
   return stages.find((s) => s.key === key)?.label ?? key;
 }
 
+export function stageDescriptionFrom(stages: Stage[], key: string): string | null {
+  return stages.find((s) => s.key === key)?.description || null;
+}
+
 export function isFinalStage(stages: Stage[], key: string): boolean {
   return stages.find((s) => s.key === key)?.is_final ?? false;
 }
