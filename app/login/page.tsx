@@ -2,10 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,17 +14,19 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    })
 
-    if (error) {
-      setError('שם משתמש או סיסמה שגויים')
+    if (res.ok) {
+      router.push('/admin/orders')
+      router.refresh()
+    } else {
+      setError('סיסמה שגויה')
       setLoading(false)
-      return
     }
-
-    router.push('/admin')
-    router.refresh()
   }
 
   return (
@@ -35,17 +35,6 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">כניסה למערכת</h1>
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">אימייל</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              required
-              autoComplete="email"
-            />
-          </div>
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">סיסמה</label>
             <input
               type="password"
@@ -53,6 +42,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
               required
+              autoFocus
               autoComplete="current-password"
             />
           </div>
