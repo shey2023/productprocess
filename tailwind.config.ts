@@ -6,7 +6,11 @@ const config: Config = {
     './lib/**/*.{ts,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        cream: '#f7f3ef',
+      },
+    },
   },
   plugins: [],
 }
