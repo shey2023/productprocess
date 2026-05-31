@@ -7,9 +7,12 @@ export default async function StagesPage() {
   const stages = await getStages()
 
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">ניהול שלבים</h1>
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">ניהול שלבי ייצור</h1>
+      <p className="text-sm text-gray-500 mb-6">
+        גרור שלבים לשינוי הסדר. כל שינוי נשמר אוטומטית.
+      </p>
       <StagesClient initialStages={stages} />
-    </main>
+    </div>
   )
 }
