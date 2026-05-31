@@ -1,22 +1,27 @@
-import { createClient } from '@/lib/supabase/server'
+import "server-only";
+import { supabaseAdmin } from "./supabase-server";
 
 export type Stage = {
-  id: string
-  key: string
-  label: string
-  description: string | null
-  sort_order: number
-  is_final: boolean
-  created_at: string
-}
+  id: string;
+  key: string;
+  label: string;
+  description: string | null;
+  sort_order: number;
+  is_final: boolean;
+};
 
 export async function getStages(): Promise<Stage[]> {
-  const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('stages')
-    .select('id, key, label, description, sort_order, is_final, created_at')
-    .order('sort_order', { ascending: true })
+  const { data } = await supabaseAdmin
+    .from("stages")
+    .select("id, key, label, description, sort_order, is_final")
+    .order("sort_order", { ascending: true });
+  return data ?? [];
+}
 
-  if (error) throw error
-  return data ?? []
+export function stageLabelFrom(stages: Stage[], key: string): string {
+  return stages.find((s) => s.key === key)?.label ?? key;
+}
+
+export function isFinalStage(stages: Stage[], key: string): boolean {
+  return stages.find((s) => s.key === key)?.is_final ?? false;
 }
