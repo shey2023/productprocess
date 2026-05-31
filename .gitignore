@@ -1,0 +1,18 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# package lock (use yarn or pnpm instead, or keep if preferred)
+package-lock.json
+
+# misc
+.DS_Store
+*.pem
