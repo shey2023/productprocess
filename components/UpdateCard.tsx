@@ -6,6 +6,7 @@ import Lightbox from "./Lightbox";
 
 type Props = {
   stageLabel: string;
+  stageDescription?: string | null;
   createdAt: string;
   noteText?: string | null;
   images: string[];
@@ -14,6 +15,7 @@ type Props = {
 
 export default function UpdateCard({
   stageLabel,
+  stageDescription,
   createdAt,
   noteText,
   images,
@@ -41,6 +43,10 @@ export default function UpdateCard({
             {new Date(createdAt).toLocaleDateString("he-IL")}
           </span>
         </div>
+
+        {stageDescription && (
+          <p className="mb-2 text-xs leading-relaxed text-stone/70 italic">{stageDescription}</p>
+        )}
 
         {noteText && (
           <p className="mb-4 text-sm leading-relaxed text-stone">{noteText}</p>
