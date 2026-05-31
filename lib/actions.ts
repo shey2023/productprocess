@@ -31,7 +31,7 @@ export async function addStage(label: string, description: string | null = null,
   const { error } = await supabaseAdmin.from("stages").insert({
     key: slugify(label),
     label: label.trim(),
-    description,
+    description: description ?? '',
     sort_order: (last?.sort_order ?? 0) + 10,
     is_final: isFinal,
   });
@@ -47,7 +47,7 @@ export async function updateStage(
 ) {
   const { error } = await supabaseAdmin
     .from("stages")
-    .update({ label, description, is_final })
+    .update({ label, description: description ?? '', is_final })
     .eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/stages");

@@ -5,13 +5,18 @@ import {
   DndContext,
   closestCenter,
   PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
 } from '@dnd-kit/core'
 import {
   arrayMove,
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
@@ -26,6 +31,7 @@ function StageRow({
   onMoveDown,
   isFirst,
   isLast,
+  overlay = false,
 }: {
   stage: Stage
   onDelete: (id: string) => void
@@ -33,6 +39,7 @@ function StageRow({
   onMoveDown: (id: string) => void
   isFirst: boolean
   isLast: boolean
+  overlay?: boolean
 }) {
   const [label, setLabel] = useState(stage.label)
   const [description, setDescription] = useState(stage.description ?? '')
@@ -43,11 +50,13 @@ function StageRow({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: stage.id })
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  }
+  const style = overlay
+    ? { boxShadow: '0 8px 32px rgba(26,24,20,0.15)', opacity: 1, background: 'var(--ivory, #FAF8F5)' }
+    : {
+        transform: CSS.Translate.toString(transform),
+        transition,
+        opacity: isDragging ? 0 : 1,
+      }
 
   function handleSave() {
     startTransition(async () => {
@@ -59,9 +68,9 @@ function StageRow({
 
   return (
     <li
-      ref={setNodeRef}
+      ref={overlay ? undefined : setNodeRef}
       style={style}
-      className="flex items-start gap-3 py-5"
+      className="flex items-start gap-3 py-5 bg-ivory"
     >
       <div className="flex flex-col gap-0.5 pt-1 shrink-0">
         <button
@@ -81,9 +90,8 @@ function StageRow({
       </div>
 
       <button
-        {...attributes}
-        {...listeners}
-        className="text-stone/30 hover:text-stone cursor-grab active:cursor-grabbing pt-1 shrink-0 text-lg leading-none select-none"
+        {...(overlay ? {} : { ...attributes, ...listeners })}
+        className="text-stone/30 hover:text-stone cursor-grab active:cursor-grabbing pt-1 shrink-0 text-lg leading-none select-none touch-none"
         title="גרור לשינוי סדר"
       >
         ⠿
@@ -141,11 +149,29 @@ function StageRow({
 export default function StagesClient({ initialStages }: { initialStages: Stage[] }) {
   const [stages, setStages] = useState(initialStages)
   const [newLabel, setNewLabel] = useState('')
+  const [activeId, setActiveId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const activeStage = activeId ? stages.find((s) => s.id === activeId) : null
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(String(event.active.id))
+  }
 
   function handleDragEnd(event: DragEndEvent) {
+    setActiveId(null)
     const { active, over } = event
     if (!over || active.id === over.id) return
 
@@ -156,6 +182,10 @@ export default function StagesClient({ initialStages }: { initialStages: Stage[]
       startTransition(() => reorderStages(reordered.map((s) => s.id)))
       return reordered
     })
+  }
+
+  function handleDragCancel() {
+    setActiveId(null)
   }
 
   function handleMoveUp(id: string) {
@@ -193,9 +223,15 @@ export default function StagesClient({ initialStages }: { initialStages: Stage[]
 
   return (
     <div>
-      <ul className="mb-12 divide-y divide-hairline">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={stages.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <SortableContext items={stages.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+          <ul className="mb-12 divide-y divide-hairline">
             {stages.map((stage, index) => (
               <StageRow
                 key={stage.id}
@@ -207,13 +243,26 @@ export default function StagesClient({ initialStages }: { initialStages: Stage[]
                 isLast={index === stages.length - 1}
               />
             ))}
-          </SortableContext>
-        </DndContext>
+            {stages.length === 0 && (
+              <li className="py-10 text-center text-sm text-stone">אין שלבים עדיין</li>
+            )}
+          </ul>
+        </SortableContext>
 
-        {stages.length === 0 && (
-          <li className="py-10 text-center text-sm text-stone">אין שלבים עדיין</li>
-        )}
-      </ul>
+        <DragOverlay>
+          {activeStage && (
+            <StageRow
+              stage={activeStage}
+              onDelete={() => {}}
+              onMoveUp={() => {}}
+              onMoveDown={() => {}}
+              isFirst={false}
+              isLast={false}
+              overlay
+            />
+          )}
+        </DragOverlay>
+      </DndContext>
 
       <section className="panel p-8">
         <h2 className="mb-6 text-xl font-normal text-ink">הוסף שלב</h2>
