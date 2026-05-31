@@ -68,7 +68,7 @@ export default function JourneyTrail({
                   <Dot current={current} />
                 </span>
                 <span
-                  className={`text-sm ${
+                  className={`text-sm pr-8 ${
                     current ? "text-gold-deep" : "text-ink/70"
                   }`}
                 >
