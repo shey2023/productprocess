@@ -1,97 +1,68 @@
-'use client'
-
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import Link from "next/link";
+import { createOrder } from "@/lib/actions";
 
 export default function NewOrderPage() {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [form, setForm] = useState({
-    customer_name: '',
-    phone_number: '',
-    jewelry_type: '',
-    material: '',
-    stones: '',
-    size: '',
-    price: '',
-    estimated_completion_date: '',
-    internal_notes: '',
-  })
-
-  function set(key: string, value: string) {
-    setForm((prev) => ({ ...prev, [key]: value }))
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    startTransition(async () => {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      if (res.ok) {
-        const { id } = await res.json()
-        router.push(`/admin/orders/${id}`)
-      }
-    })
-  }
-
   return (
-    <div className="min-h-screen px-6 py-10 max-w-xl mx-auto" dir="rtl">
-      <div className="mb-1 text-sm text-gray-400 text-right">
-        <Link href="/admin/orders" className="hover:text-gray-600 transition-colors">
-          ← חזרה להזמנות
-        </Link>
-      </div>
+    <main className="mx-auto max-w-xl px-6 py-16">
+      <Link
+        href="/admin"
+        className="text-xs tracking-wide text-stone transition hover:text-ink"
+      >
+        ← חזרה להזמנות
+      </Link>
+      <p className="eyebrow mb-2 mt-8">הזמנה חדשה</p>
+      <h1 className="mb-10 text-3xl font-normal text-ink">פרטי הזמנה</h1>
 
-      <div className="mt-6 mb-8">
-        <p className="text-xs text-gray-400 tracking-widest mb-1">הזמנה חדשה</p>
-        <h1 className="text-4xl font-bold text-gray-900">פרטי הזמנה</h1>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {[
-          { key: 'customer_name', label: 'שם לקוח', required: true },
-          { key: 'phone_number', label: 'טלפון' },
-          { key: 'jewelry_type', label: 'סוג תכשיט', required: true },
-          { key: 'material', label: 'חומר (זהב/כסף...)' },
-          { key: 'stones', label: 'אבנים' },
-          { key: 'size', label: 'מידה' },
-          { key: 'price', label: 'מחיר (₪)', type: 'number' },
-          { key: 'estimated_completion_date', label: 'תאריך יעד', type: 'date' },
-        ].map(({ key, label, required, type }) => (
-          <div key={key}>
-            <label className="block text-xs text-gray-400 mb-1">{label}</label>
-            <input
-              type={type ?? 'text'}
-              value={(form as Record<string, string>)[key]}
-              onChange={(e) => set(key, e.target.value)}
-              required={required}
-              className="w-full bg-transparent border-b border-gray-300 focus:border-gray-600 outline-none text-base pb-1 text-right"
-            />
+      <form action={createOrder} className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label className="label">שם לקוח *</label>
+            <input name="customer_name" required className="field" />
           </div>
-        ))}
+          <div>
+            <label className="label">טלפון / WhatsApp</label>
+            <input name="phone_number" type="tel" className="field" dir="ltr" />
+          </div>
+          <div>
+            <label className="label">סוג תכשיט *</label>
+            <input name="jewelry_type" required className="field" />
+          </div>
+          <div>
+            <label className="label">חומר (זהב/כסף...)</label>
+            <input name="material" className="field" />
+          </div>
+          <div>
+            <label className="label">אבנים</label>
+            <input name="stones" className="field" />
+          </div>
+          <div>
+            <label className="label">מידה</label>
+            <input name="size" className="field" />
+          </div>
+          <div>
+            <label className="label">מחיר (₪)</label>
+            <input name="price" type="number" step="0.01" className="field" />
+          </div>
+          <div>
+            <label className="label">תאריך יעד לסיום</label>
+            <input name="estimated_completion_date" type="date" className="field" />
+          </div>
+        </div>
 
         <div>
-          <label className="block text-xs text-gray-400 mb-1">הערות פנימיות</label>
+          <label className="label">הערות פנימיות</label>
           <textarea
-            value={form.internal_notes}
-            onChange={(e) => set('internal_notes', e.target.value)}
+            name="internal_notes"
             rows={3}
-            className="w-full bg-transparent border-b border-gray-300 focus:border-gray-600 outline-none text-sm pb-1 text-right resize-none"
+            placeholder="הערות פנימיות שלא יוצגו ללקוח"
+            className="field"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="w-full py-3 rounded-full border border-gray-400 text-gray-800 hover:bg-gray-100 transition-colors disabled:opacity-50 mt-4"
-        >
-          {isPending ? 'שומר...' : 'צור הזמנה'}
+        <button type="submit" className="btn-primary w-full py-3 sm:w-auto">
+          צור הזמנה
         </button>
       </form>
-    </div>
-  )
+    </main>
+  );
 }

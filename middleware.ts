@@ -1,15 +1,22 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from "next/server";
+import { ADMIN_COOKIE, expectedToken } from "@/lib/auth";
 
-export function middleware(request: NextRequest) {
-  const session = request.cookies.get('admin_session')
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-  if (!session && request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (pathname === "/admin/login") return NextResponse.next();
+
+  if (pathname.startsWith("/admin")) {
+    const cookie = request.cookies.get(ADMIN_COOKIE)?.value;
+    const valid = cookie && cookie === (await expectedToken());
+    if (!valid) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
-}
+  matcher: ["/admin/:path*"],
+};

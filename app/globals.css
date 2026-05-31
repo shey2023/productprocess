@@ -2,17 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
+:root {
+  color-scheme: light;
 }
 
-html, body {
-  direction: rtl;
-  background-color: #f7f3ef;
-  color: #1a1a1a;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+@layer base {
+  body {
+    background-color: #FAF8F5;
+    background-image:
+      radial-gradient(at 50% 0%, rgba(232, 216, 183, 0.18) 0%, transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.65 0 0 0 0 0.55 0 0 0 0 0.38 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-attachment: fixed, fixed;
+    background-size: auto, 160px 160px;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-playfair), var(--font-frank), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .font-hebrew-serif {
+    font-family: var(--font-frank), Georgia, serif;
+  }
+
+  ::selection {
+    background: #C9A96E;
+    color: #1A1814;
+  }
+
+  .safe-px {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  .safe-pb {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+  .safe-pt {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
 }
 
-input, textarea, button {
-  font-family: inherit;
+@layer components {
+  .eyebrow {
+    @apply text-[10px] uppercase tracking-wider2 text-stone font-light;
+  }
+
+  .panel {
+    @apply rounded-2xl border border-hairline bg-porcelain/80 backdrop-blur-sm shadow-soft;
+  }
+
+  .field {
+    @apply w-full border-0 border-b border-hairline bg-transparent px-1 py-2.5
+           text-ink outline-none transition-colors
+           placeholder:text-stone/50 focus:border-gold rounded-none;
+  }
+
+  .field-boxed {
+    @apply w-full rounded-lg border border-hairline bg-porcelain px-4 py-2.5
+           text-ink outline-none transition
+           placeholder:text-stone/60 focus:border-gold;
+  }
+
+  .btn-primary {
+    @apply rounded-full bg-ink px-6 py-3 text-xs font-normal tracking-wider2 uppercase
+           text-ivory transition-all duration-150 active:scale-[0.97]
+           hover:bg-gold-deep;
+  }
+
+  .btn-ghost {
+    @apply rounded-full border border-hairline px-5 py-2.5 text-xs tracking-wider2 uppercase
+           text-stone transition-all duration-150 active:scale-[0.97]
+           hover:border-gold hover:text-ink;
+  }
+
+  .label {
+    @apply mb-1.5 block text-[10px] uppercase tracking-wider2 text-stone;
+  }
+
+  .shimmer-mask {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-mask::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.55) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    animation: shimmer 2.8s ease-in-out infinite;
+  }
+
+  .top-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C9A96E, transparent);
+    z-index: 9999;
+    animation: progressBar 1.2s ease-in-out infinite;
+  }
 }

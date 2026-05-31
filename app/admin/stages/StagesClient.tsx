@@ -58,89 +58,83 @@ function StageRow({
   }
 
   return (
-    <div
+    <li
       ref={setNodeRef}
       style={style}
-      className="border-b border-gray-200 py-4"
-      dir="rtl"
+      className="flex items-start gap-3 py-5"
     >
-      <div className="flex items-start gap-3">
-        {/* Up/Down arrows */}
-        <div className="flex flex-col gap-0.5 pt-1 flex-shrink-0">
-          <button
-            onClick={() => onMoveUp(stage.id)}
-            disabled={isFirst}
-            className="text-gray-300 hover:text-gray-600 disabled:opacity-20 leading-none text-xs"
-          >
-            ▲
-          </button>
-          <button
-            onClick={() => onMoveDown(stage.id)}
-            disabled={isLast}
-            className="text-gray-300 hover:text-gray-600 disabled:opacity-20 leading-none text-xs"
-          >
-            ▼
-          </button>
-        </div>
-
-        {/* Drag handle */}
+      <div className="flex flex-col gap-0.5 pt-1 shrink-0">
         <button
-          {...attributes}
-          {...listeners}
-          className="text-gray-200 hover:text-gray-400 cursor-grab active:cursor-grabbing pt-1 flex-shrink-0 text-lg leading-none select-none"
-          title="גרור לשינוי סדר"
+          onClick={() => onMoveUp(stage.id)}
+          disabled={isFirst}
+          className="text-stone/40 transition hover:text-ink disabled:opacity-20 leading-none text-xs"
         >
-          ⠿
+          ▲
+        </button>
+        <button
+          onClick={() => onMoveDown(stage.id)}
+          disabled={isLast}
+          className="text-stone/40 transition hover:text-ink disabled:opacity-20 leading-none text-xs"
+        >
+          ▼
+        </button>
+      </div>
+
+      <button
+        {...attributes}
+        {...listeners}
+        className="text-stone/30 hover:text-stone cursor-grab active:cursor-grabbing pt-1 shrink-0 text-lg leading-none select-none"
+        title="גרור לשינוי סדר"
+      >
+        ⠿
+      </button>
+
+      <div className="flex-1 min-w-0">
+        <input
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          className="field w-full mb-2"
+          placeholder="שם השלב"
+        />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={2}
+          className="field w-full text-sm text-stone resize-none"
+          placeholder="תיאור השלב (אופציונלי)"
+        />
+      </div>
+
+      <div className="flex items-center gap-3 shrink-0 pt-1">
+        <label className="flex shrink-0 items-center gap-1.5 text-xs text-stone cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={isFinal}
+            onChange={(e) => setIsFinal(e.target.checked)}
+            className="accent-gold"
+          />
+          סופי
+        </label>
+
+        <button
+          onClick={handleSave}
+          disabled={isPending}
+          className="btn-ghost shrink-0 px-4 py-2 min-w-[60px]"
+        >
+          {saved ? '✓' : isPending ? '...' : 'שמור'}
         </button>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            className="w-full bg-transparent border-b border-gray-300 focus:border-gray-600 outline-none text-base text-right pb-0.5 mb-2"
-            placeholder="שם השלב"
-          />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={2}
-            className="w-full bg-transparent border-b border-gray-200 focus:border-gray-400 outline-none text-sm text-right text-gray-500 resize-none pb-0.5"
-            placeholder="תיאור השלב (אופציונלי)"
-          />
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center gap-2 flex-shrink-0 pt-1">
-          <label className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer select-none">
-            <span>סופי</span>
-            <input
-              type="checkbox"
-              checked={isFinal}
-              onChange={(e) => setIsFinal(e.target.checked)}
-              className="rounded-full w-4 h-4 accent-gray-600"
-            />
-          </label>
-
-          <button
-            onClick={handleSave}
-            disabled={isPending}
-            className="px-4 py-1.5 rounded-full border border-gray-300 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition-colors min-w-[60px]"
-          >
-            {saved ? '✓' : isPending ? '...' : 'שמור'}
-          </button>
-
-          <button
-            onClick={() => {
-              if (confirm('למחוק שלב זה?')) onDelete(stage.id)
-            }}
-            className="px-3 py-1.5 rounded-full border border-gray-200 text-sm text-gray-400 hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-colors"
-          >
-            ×
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            if (confirm('למחוק שלב זה?')) onDelete(stage.id)
+          }}
+          className="shrink-0 text-stone transition hover:text-gold-deep"
+          aria-label="מחק שלב"
+        >
+          ✕
+        </button>
       </div>
-    </div>
+    </li>
   )
 }
 
@@ -192,50 +186,57 @@ export default function StagesClient({ initialStages }: { initialStages: Stage[]
   function handleAdd() {
     if (!newLabel.trim()) return
     startTransition(async () => {
-      await addStage(newLabel.trim(), null)
+      await addStage(newLabel.trim(), null, false)
       setNewLabel('')
     })
   }
 
   return (
-    <div dir="rtl">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={stages.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-          {stages.map((stage, index) => (
-            <StageRow
-              key={stage.id}
-              stage={stage}
-              onDelete={handleDelete}
-              onMoveUp={handleMoveUp}
-              onMoveDown={handleMoveDown}
-              isFirst={index === 0}
-              isLast={index === stages.length - 1}
+    <div>
+      <ul className="mb-12 divide-y divide-hairline">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={stages.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+            {stages.map((stage, index) => (
+              <StageRow
+                key={stage.id}
+                stage={stage}
+                onDelete={handleDelete}
+                onMoveUp={handleMoveUp}
+                onMoveDown={handleMoveDown}
+                isFirst={index === 0}
+                isLast={index === stages.length - 1}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+
+        {stages.length === 0 && (
+          <li className="py-10 text-center text-sm text-stone">אין שלבים עדיין</li>
+        )}
+      </ul>
+
+      <section className="panel p-8">
+        <h2 className="mb-6 text-xl font-normal text-ink">הוסף שלב</h2>
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <label className="label">שם השלב</label>
+            <input
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              placeholder="לדוגמה: עיצוב, יציקה, ליטוש"
+              className="field"
             />
-          ))}
-        </SortableContext>
-      </DndContext>
-
-      {stages.length === 0 && (
-        <p className="text-center text-gray-400 text-sm py-10">אין שלבים עדיין</p>
-      )}
-
-      {/* Add new stage */}
-      <div className="mt-8 flex gap-2" dir="rtl">
-        <input
-          value={newLabel}
-          onChange={(e) => setNewLabel(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          placeholder="שם שלב חדש..."
-          className="flex-1 bg-transparent border-b border-gray-300 focus:border-gray-600 outline-none text-sm pb-1 text-right"
-        />
-        <button
-          onClick={handleAdd}
-          disabled={!newLabel.trim() || isPending}
-          className="px-4 py-1.5 rounded-full border border-gray-300 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-40 transition-colors"
-        >
-          + הוסף
-        </button>
-      </div>
+          </div>
+          <button
+            onClick={handleAdd}
+            disabled={!newLabel.trim() || isPending}
+            className="btn-primary shrink-0"
+          >
+            הוסף
+          </button>
+        </div>
+      </section>
     </div>
   )
 }
