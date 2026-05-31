@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import { supabaseAdmin, JEWELRY_BUCKET } from "@/lib/supabase-server";
 import { getStages, stageLabelFrom } from "@/lib/stages";
-import { updateOrderDetails, addUpdate, deleteOrder } from "@/lib/actions";
+import { updateOrderDetails, addUpdate, deleteOrder, deleteUpdate } from "@/lib/actions";
 import CopyLink from "@/components/CopyLink";
 import DeleteOrderButton from "@/components/DeleteOrderButton";
+import DeleteUpdateButton from "@/components/DeleteUpdateButton";
 
 export const dynamic = "force-dynamic";
 
@@ -191,16 +192,21 @@ export default async function OrderDetail({
           <p className="text-sm text-stone">אין עדיין עדכונים.</p>
         ) : (
           <ol className="relative space-y-8 border-r border-hairline pr-5 sm:pr-6">
-            {updates.map((u) => (
+            {updates.map((u) => {
+              const removeUpdate = deleteUpdate.bind(null, u.id, id);
+              return (
               <li key={u.id} className="relative">
                 <span className="absolute -right-[25px] top-1.5 h-2 w-2 rounded-full bg-gold ring-2 ring-ivory sm:-right-[27px]" />
                 <div className="mb-1 flex items-baseline justify-between gap-2">
                   <span className="font-serif text-base text-ink sm:text-lg">
                     {stageLabelFrom(stages, u.stage)}
                   </span>
-                  <span className="shrink-0 text-xs text-stone">
-                    {new Date(u.created_at).toLocaleDateString("he-IL")}
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-xs text-stone">
+                      {new Date(u.created_at).toLocaleDateString("he-IL")}
+                    </span>
+                    <DeleteUpdateButton onConfirm={removeUpdate} />
+                  </div>
                 </div>
                 {u.note_text && (
                   <p className="mb-3 text-sm leading-relaxed text-stone">{u.note_text}</p>
@@ -218,7 +224,7 @@ export default async function OrderDetail({
                   </div>
                 )}
               </li>
-            ))}
+            )})}
           </ol>
         )}
       </section>

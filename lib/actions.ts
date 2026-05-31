@@ -53,6 +53,35 @@ export async function updateStage(
   revalidatePath("/admin/stages");
 }
 
+export async function deleteUpdate(updateId: string, orderId: string) {
+  const { data: images } = await supabaseAdmin
+    .from("order_update_images")
+    .select("storage_path")
+    .eq("update_id", updateId);
+
+  if (images?.length) {
+    await supabaseAdmin.storage.from(JEWELRY_BUCKET).remove(images.map((i) => i.storage_path));
+  }
+
+  const { error } = await supabaseAdmin.from("order_updates").delete().eq("id", updateId);
+  if (error) throw new Error(error.message);
+
+  // Revert current_stage to latest remaining update, if any
+  const { data: latest } = await supabaseAdmin
+    .from("order_updates")
+    .select("stage")
+    .eq("order_id", orderId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latest) {
+    await supabaseAdmin.from("orders").update({ current_stage: latest.stage }).eq("id", orderId);
+  }
+
+  revalidatePath(`/admin/orders/${orderId}`);
+}
+
 export async function deleteStage(stageId: string) {
   const { error } = await supabaseAdmin.from("stages").delete().eq("id", stageId);
   if (error) throw new Error(error.message);
