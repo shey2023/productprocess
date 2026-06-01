@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Heebo, Frank_Ruhl_Libre, Playfair_Display } from "next/font/google";
 import { Suspense } from "react";
+import Script from "next/script";
 import "./globals.css";
 import { ToastProvider } from "@/components/Toast";
 import TopProgressBar from "@/components/TopProgressBar";
@@ -51,6 +52,11 @@ export default function RootLayout({
       className={`${heebo.variable} ${frank.variable} ${playfair.variable}`}
     >
       <body className="min-h-screen bg-ivory font-sans font-light text-ink antialiased">
+        <Script id="no-zoom" strategy="beforeInteractive">{`
+          document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+          document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
+          document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
+        `}</Script>
         <Suspense fallback={null}>
           <TopProgressBar />
         </Suspense>
