@@ -37,4 +37,11 @@ describe("CopyLink", () => {
     await userEvent.click(screen.getByRole("button", { name: /העתק/i }));
     expect(screen.getByRole("button", { name: /הועתק/i })).toBeInTheDocument();
   });
+
+  it("renders an open link that points to the URL", () => {
+    render(<CopyLink url="https://example.com/track/abc123" />);
+    const link = screen.getByRole("link", { name: /פתח/i });
+    expect(link).toHaveAttribute("href", "https://example.com/track/abc123");
+    expect(link).toHaveAttribute("target", "_blank");
+  });
 });
