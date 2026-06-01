@@ -40,6 +40,14 @@ export default function CopyLink({ url }: { url: string }) {
       >
         {copied ? "✓ הועתק" : "העתק"}
       </button>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="btn-ghost shrink-0 px-4 py-2 text-[10px]"
+      >
+        פתח
+      </a>
     </div>
   );
 }
