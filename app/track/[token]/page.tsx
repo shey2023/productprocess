@@ -82,6 +82,9 @@ export default async function TrackPage({
       ) : (
         <header className="mb-14 text-center sm:mb-20">
           <p className="eyebrow mb-4">Shey · בית מלאכה</p>
+          <div className="mx-auto mb-4 h-12 w-12">
+            <img src="/logo.svg" alt="לוגו שי" className="h-full w-full object-contain" />
+          </div>
           <p className="text-sm text-stone">שלום {order.customer_name},</p>
           <h1 className="font-hebrew-serif mt-2 text-3xl font-normal leading-tight text-ink sm:text-5xl">
             {order.jewelry_type}
