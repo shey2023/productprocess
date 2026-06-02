@@ -4,18 +4,10 @@ import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabaseAdmin, JEWELRY_BUCKET } from "@/lib/supabase-server";
+import { slugify } from "@/lib/utils";
 
 function newToken(): string {
   return randomBytes(12).toString("hex");
-}
-
-function slugify(label: string): string {
-  const base = label
-    .trim()
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "_")
-    .replace(/^_+|_+$/g, "");
-  return base ? `${base}_${randomBytes(2).toString("hex")}` : randomBytes(4).toString("hex");
 }
 
 export async function addStage(label: string, description: string | null = null, isFinal = false) {
